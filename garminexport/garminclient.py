@@ -38,14 +38,14 @@ from garminexport.retryer import Retryer, ExponentialBackoffDelayStrategy, MaxRe
 # used by this module, log in to your Garmin Connect account
 # through the web browser and visit the API documentation page
 # for the REST service of interest. For example:
-#   https://connect.garmin.com/proxy/activity-service-1.3/index.html
-#   https://connect.garmin.com/proxy/activity-search-service-1.2/index.html
+#   https://connect.garmin.cn/proxy/activity-service-1.3/index.html
+#   https://connect.garmin.cn/proxy/activity-search-service-1.2/index.html
 #
 
 #
 # Other useful references:
 #   https://github.com/cpfair/tapiriik/blob/master/tapiriik/services/GarminConnect/garminconnect.py
-#   https://forums.garmin.com/showthread.php?72150-connect-garmin-com-signin-question/page2
+#   https://forums.garmin.cn/showthread.php?72150-connect-garmin-com-signin-question/page2
 #
 
 log = logging.getLogger(__name__)
@@ -53,9 +53,9 @@ log = logging.getLogger(__name__)
 # reduce logging noise from requests library
 logging.getLogger("requests").setLevel(logging.ERROR)
 
-SSO_LOGIN_URL = "https://sso.garmin.com/sso/login"
+SSO_LOGIN_URL = "https://sso.garmin.cn/sso/login"
 """Garmin Connect's Single-Sign On login URL."""
-SSO_SIGNIN_URL = "https://sso.garmin.com/sso/signin"
+SSO_SIGNIN_URL = "https://sso.garmin.cn/sso/signin"
 """The Garmin Connect Single-Sign On sign-in URL. This is where the login form
 gets POSTed."""
 
@@ -141,7 +141,7 @@ class GarminClient(object):
             "_csrf": self._get_csrf_token(),
         }
         headers = {
-            'origin': 'https://sso.garmin.com',
+            'origin': 'https://sso.garmin.cn',
         }
         if self._user_agent_fn:
             user_agent = self._user_agent_fn()
@@ -166,7 +166,7 @@ class GarminClient(object):
 
         # appears like we need to touch base with the main page to complete the
         # login ceremony.
-        self.session.get('https://connect.garmin.com/modern')
+        self.session.get('https://connect.garmin.cn/modern')
 
 
     def _get_csrf_token(self):
@@ -189,8 +189,8 @@ class GarminClient(object):
         accept our login attempt.
         """
         return {
-            "service": "https://connect.garmin.com/modern/",
-            "gauthHost": "https://sso.garmin.com/sso",
+            "service": "https://connect.garmin.cn/modern/",
+            "gauthHost": "https://sso.garmin.cn/sso",
         }
 
 
@@ -200,7 +200,7 @@ class GarminClient(object):
         authentication form submission. The auth ticket URL is typically
         of form:
 
-          https://connect.garmin.com/modern?ticket=ST-0123456-aBCDefgh1iJkLmN5opQ9R-cas
+          https://connect.garmin.cn/modern?ticket=ST-0123456-aBCDefgh1iJkLmN5opQ9R-cas
 
         :param auth_response: HTML response from an auth form submission.
         """
@@ -248,7 +248,7 @@ class GarminClient(object):
         """
         log.debug("fetching activities %d through %d ...", start_index, start_index + max_limit - 1)
         response = self.session.get(
-            "https://connect.garmin.com/proxy/activitylist-service/activities/search/activities",
+            "https://connect.garmin.cn/proxy/activitylist-service/activities/search/activities",
             params={"start": start_index, "limit": max_limit})
         if response.status_code != 200:
             raise Exception(
@@ -281,7 +281,7 @@ class GarminClient(object):
         :rtype: dict
         """
         response = self.session.get(
-            "https://connect.garmin.com/proxy/activity-service/activity/{}".format(activity_id))
+            "https://connect.garmin.cn/proxy/activity-service/activity/{}".format(activity_id))
         if response.status_code != 200:
             log.error(u"failed to fetch json summary for activity %s: %d\n%s",
                       activity_id, response.status_code, response.text)
@@ -302,7 +302,7 @@ class GarminClient(object):
         """
         # mounted at xml or json depending on result encoding
         response = self.session.get(
-            "https://connect.garmin.com/proxy/activity-service/activity/{}/details".format(activity_id))
+            "https://connect.garmin.cn/proxy/activity-service/activity/{}/details".format(activity_id))
         if response.status_code != 200:
             raise Exception(u"failed to fetch json activityDetails for {}: {}\n{}".format(
                 activity_id, response.status_code, response.text))
@@ -322,11 +322,11 @@ class GarminClient(object):
         :rtype: str
         """
         response = self.session.get(
-            "https://connect.garmin.com/proxy/download-service/export/gpx/activity/{}".format(activity_id))
+            "https://connect.garmin.cn/proxy/download-service/export/gpx/activity/{}".format(activity_id))
         # An alternate URL that seems to produce the same results
         # and is the one used when exporting through the Garmin
         # Connect web page.
-        # response = self.session.get("https://connect.garmin.com/proxy/activity-service-1.1/gpx/activity/{}?full=true".format(activity_id))
+        # response = self.session.get("https://connect.garmin.cn/proxy/activity-service-1.1/gpx/activity/{}?full=true".format(activity_id))
 
         # A 404 (Not Found) or 204 (No Content) response are both indicators
         # of a gpx file not being available for the activity. It may, for
@@ -354,7 +354,7 @@ class GarminClient(object):
         """
 
         response = self.session.get(
-            "https://connect.garmin.com/proxy/download-service/export/tcx/activity/{}".format(activity_id))
+            "https://connect.garmin.cn/proxy/download-service/export/tcx/activity/{}".format(activity_id))
         if response.status_code == 404:
             return None
         if response.status_code != 200:
@@ -375,7 +375,7 @@ class GarminClient(object):
         :rtype: (str, str)
         """
         response = self.session.get(
-            "https://connect.garmin.com/proxy/download-service/files/activity/{}".format(activity_id))
+            "https://connect.garmin.cn/proxy/download-service/files/activity/{}".format(activity_id))
         # A 404 (Not Found) response is a clear indicator of a missing .fit
         # file. As of lately, the endpoint appears to have started to
         # respond with 500 "NullPointerException" on attempts to download a
@@ -431,10 +431,10 @@ class GarminClient(object):
           :obj:`None` if upload is still processing.
         :rtype: int
         """
-        response = self.session.get("https://connect.garmin.com/proxy/activity-service/activity/status/{}/{}?_={}".format(
+        response = self.session.get("https://connect.garmin.cn/proxy/activity-service/activity/status/{}/{}?_={}".format(
             creation_date[:10], uuid.replace("-",""), int(datetime.now().timestamp()*1000)), headers={"nk": "NT"})
         if response.status_code == 201 and response.headers["location"]:
-            # location should be https://connectapi.garmin.com/activity-service/activity/ACTIVITY_ID
+            # location should be https://connectapi.garmin.cn/activity-service/activity/ACTIVITY_ID
             return int(response.headers["location"].split("/")[-1])
         elif response.status_code == 202:
             return None # still processing
@@ -474,7 +474,7 @@ class GarminClient(object):
 
         # upload it
         files = dict(data=(fn, file))
-        response = self.session.post("https://connect.garmin.com/proxy/upload-service/upload/.{}".format(format),
+        response = self.session.post("https://connect.garmin.cn/proxy/upload-service/upload/.{}".format(format),
                                      files=files, headers={"nk": "NT"})
 
         # check response and get activity ID
@@ -527,7 +527,7 @@ class GarminClient(object):
             data['activityId'] = activity_id
             encoding_headers = {"Content-Type": "application/json; charset=UTF-8"}  # see Tapiriik
             response = self.session.put(
-                "https://connect.garmin.com/proxy/activity-service/activity/{}".format(activity_id),
+                "https://connect.garmin.cn/proxy/activity-service/activity/{}".format(activity_id),
                 data=json.dumps(data), headers=encoding_headers)
             if response.status_code != 204:
                 raise Exception(u"failed to set metadata for activity {}: {}\n{}".format(

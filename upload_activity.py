@@ -62,7 +62,7 @@ def main():
                 except Exception as e:
                     log.error("upload failed: {!r}".format(e))
                 else:
-                    log.info("upload successful: https://connect.garmin.com/modern/activity/%s", id)
+                    log.info("upload successful: https://connect.garmin.cn/modern/activity/%s", id)
 
     except Exception as e:
         log.error("failed with exception: %s", e)

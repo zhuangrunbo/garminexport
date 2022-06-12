@@ -85,3 +85,6 @@ def main():
 
     except Exception as e:
         log.error("failed with exception: {}".format(e))
+
+
+main()
