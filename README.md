@@ -18,3 +18,12 @@ The goal of this fork is slightly different, this is a simple version for people
 4.你可以在跟bat文件同一目录下的activities文件夹下找到所有下载的文件， 通过Import Data上传对应活动文件到Garmin国际域名即可
 
 5.冲就完事了 :)
+
+# Misc
+我在上传数据的时候把所有下载的文件(.tcx, .fit or .gpx format)都上传了，我拿到了3份重复的数据
+
+解决办法： 把新账号的活动全部移除，然后重新上传一次就好了
+
+https://gist.github.com/shrayasr/8ba2f9f740dfdceb31834a0eb35cb4c2
+
+
